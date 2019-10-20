@@ -84,12 +84,7 @@ for row in linkSheetContents:
             ticker = symbol.a.text # ticker of news
             dateNews = unit.tr # tr tag that had date and news
             date = dateNews.td.text.split()[0] # date of news article, will be time if it differs by time
-            
-
-            #TODO: change this to 'today'
-            if(date == 'Oct-18-19'):
-            
-            
+            if(date == today):
                 info = dateNews.a # news info
                 hyperlink = info['href'] # link to news article
                 headline = info.text # headline of news article
