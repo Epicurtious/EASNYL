@@ -79,6 +79,7 @@ while(True):
         soup = bs(html, 'lxml')
         # table with all contents
         table = soup.find(id='screener-content')
+        print(table.contents)
         # URI to news section for scraping
         newsURI = table.find('a', text='News')['href']
         # list for two news links
@@ -90,7 +91,7 @@ while(True):
         # header of table, will be header of sheet
         header = table.find(valign='middle', align='center')
         # td tags of header, tags that have text
-        header = header.findAll('td')
+        header = header.find_all('td')
         # texts inside header
         headerTexts = textOfList(header)
         # puts "Date" at the start
