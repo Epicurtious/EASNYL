@@ -79,7 +79,6 @@ while(True):
         soup = bs(html, 'lxml')
         # table with all contents
         table = soup.find(id='screener-content')
-        print(table.contents)
         # URI to news section for scraping
         newsURI = table.find('a', text='News')['href']
         # list for two news links
