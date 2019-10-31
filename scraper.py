@@ -88,9 +88,22 @@ while(True):
         # url for news second 10
         newsURL.append(urlBase + newsURI + "&r=11")
         # header of table, will be header of sheet
-        header = table.find(valign='middle', align='center')
-        # td tags of header, tags that have text
-        header = header.find_all('td')
+        # changed to header1 temporarily
+        header1 = table.find(valign='middle', align='center')
+        
+        # trying to catch attribute error and see html of such
+        try:
+            # td tags of header, tags that have text
+            header = header1.find_all('td')
+        except AttributeError:
+            print("Table:")
+            print(table)
+            print()
+            print("Header1:")
+            print(header1)
+            print()
+            print("END ERROR")
+        
         # texts inside header
         headerTexts = textOfList(header)
         # puts "Date" at the start
@@ -170,4 +183,4 @@ while(True):
                 # puts in spreadsheet
                 worksheet.insert_row(rowInsert, 2)
     # waits 15 secs so to not call the API too many times
-    time.sleep(15)
+    time.sleep(60)
