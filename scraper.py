@@ -104,6 +104,8 @@ while(True):
             print()
             print("END ERROR")
         
+        # td tags of header, tags that have text
+        header = header1.find_all('td')
         # texts inside header
         headerTexts = textOfList(header)
         # puts "Date" at the start
