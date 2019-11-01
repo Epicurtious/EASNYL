@@ -96,6 +96,7 @@ while(True):
             # td tags of header, tags that have text
             header = header1.find_all('td')
         except AttributeError:
+            print(datetime.now())
             print("Table:")
             print(table)
             print()
@@ -103,6 +104,7 @@ while(True):
             print(header1)
             print()
             print("END ERROR")
+            continue
         
         # td tags of header, tags that have text
         header = header1.find_all('td')
