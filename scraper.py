@@ -236,13 +236,8 @@ while(True):
         tickersToCheck = list(tickerNewsDict.keys())
         # goes through each stock on the page
         for row in table.find_all(True, {'class':['table-dark-row-cp', 'table-light-row-cp']}):
-            # incrementor for finding ticker
-            i = 0
             # ticker symbol of current row
-            for tag in row.find_all('td'):
-                if i == headerTextsOriginal.index("Ticker"):
-                    ticker = tag.text
-                i += 1
+            ticker = row.find('a', {"class":"screener-link-primary"}).text
             # checks if this ticker has news
             if ticker in tickersToCheck:
                 for r in range(0,len(tickerNewsDict[ticker])):
