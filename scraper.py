@@ -214,15 +214,10 @@ while(True):
                 for dateNews in unit.find_all('tr'):
                     # date and time of news article
                     dateAndTime = dateNews.td.text.split()
-                    # chekcs if only time was available
-                    if len(dateAndTime) == 1:
-                        # time from webpage
-                        timeOf = dateAndTime
-                    else:
-                        # separate the date
-                        date = dateAndTime[0]
-                        # separate the time
-                        timeOf = dateAndTime[1]
+                    # separate the date
+                    date = dateAndTime[0]
+                    # separate the time
+                    timeOf = dateAndTime[1]
                     # checks if the article is from today
                     if isFiscalDay(date,timeOf):
                         # news <a> tag, has information about article
@@ -238,11 +233,16 @@ while(True):
                     else:
                         break
         # tickers that had news articles
-        tickersToCheck = tickerNewsDict.keys()
+        tickersToCheck = list(tickerNewsDict.keys())
         # goes through each stock on the page
         for row in table.find_all(True, {'class':['table-dark-row-cp', 'table-light-row-cp']}):
+            # incrementor for finding ticker
+            i = 0
             # ticker symbol of current row
-            ticker = row.td.text
+            for tag in row.find_all('td'):
+                if i == headerTextsOriginal.index("Ticker"):
+                    ticker = tag.text
+                i += 1
             # checks if this ticker has news
             if ticker in tickersToCheck:
                 for r in range(0,len(tickerNewsDict[ticker])):
@@ -265,5 +265,5 @@ while(True):
                         rowInsert[headerDict[info[0]]] = info[1]
                     # puts in spreadsheet
                     worksheet.insert_row(rowInsert, 2,"USER_ENTERED")
-# waits 60 secs so to not call the API too many times
-time.sleep(60)
+    # waits 60 secs so to not call the API too many times
+    time.sleep(60)
