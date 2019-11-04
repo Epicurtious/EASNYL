@@ -139,21 +139,25 @@ while(True):
         newsURL.append(urlBase + newsURI + "&r=11")
         # header of table, will be header of sheet
         # changed to header1 temporarily
-        header1 = table.find(valign='middle', align='center')
+        header1 = table.find("tr", valign='middle', align='center')
         
         # trying to catch attribute error and see html of such
         try:
             # td tags of header, tags that have text
             header = header1.find_all('td')
         except AttributeError:
-            print(datetime.now())
+            """
+            print("Soup:")
+            print(soup.prettify())
             print("Table:")
-            print(table)
+            print(table.prettify())
             print()
             print("Header1:")
             print(header1)
             print()
             print("END ERROR")
+            """
+            print("BUG")
             continue
         
         # td tags of header, tags that have text
