@@ -2,10 +2,13 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from bs4 import BeautifulSoup as bs
 import requests
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from pprint import pprint
 from collections import defaultdict
 from datetime import datetime, timedelta
 import time
+import json
 
 #returns number of seconds in day today
 #for comparing time by integer rather than by string
@@ -97,8 +100,27 @@ while(True):
     creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
     client = gspread.authorize(creds)
 
+    # sleep condition
+    err = True
+
     #gets today's fiscal day
     today = getFiscalDay()
+
+    with open("user.json") as userData:
+        # json wiht private info
+        userJson = json.load(userData)        
+        # logs into account for accurrate data
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        driver = webdriver.Chrome(options=options)
+        driver.get("https://finviz.com/login.ashx")
+        user = driver.find_element_by_name("email")
+        user.clear()
+        user.send_keys(userJson["email"])
+        pw = driver.find_element_by_name("password")
+        pw.clear()
+        pw.send_keys(userJson["password"])
+        pw.send_keys(u'\ue007')
 
     # spreadsheet base
     spreadsheet = client.open("EASNYL")
@@ -123,8 +145,15 @@ while(True):
         worksheet = spreadsheet.worksheet(title)
         # link in row
         link = row[1]
+        # goes to page
+        try:
+            driver.get(link)
+        except TimeoutException:
+            print("Timout")
+            continue
+
         # html of link
-        html = requests.get(link).content
+        html = driver.page_source
         # soup object of link
         soup = bs(html, 'lxml')
         # table with all contents
@@ -141,23 +170,9 @@ while(True):
         # changed to header1 temporarily
         header1 = table.find("tr", valign='middle', align='center')
         
-        # trying to catch attribute error and see html of such
-        try:
-            # td tags of header, tags that have text
-            header = header1.find_all('td')
-        except AttributeError:
-            """
-            print("Soup:")
-            print(soup.prettify())
-            print("Table:")
-            print(table.prettify())
-            print()
-            print("Header1:")
-            print(header1)
-            print()
-            print("END ERROR")
-            """
-            print("BUG")
+        # continues if page is empty
+        if(header1 == None):
+            print("Empty Page")
             continue
         
         # td tags of header, tags that have text
@@ -263,6 +278,14 @@ while(True):
                     for info in custom:
                         rowInsert[headerDict[info[0]]] = info[1]
                     # puts in spreadsheet
-                    worksheet.insert_row(rowInsert, 2,"USER_ENTERED")
-    # waits 60 secs so to not call the API too many times
-    time.sleep(60)
+                    # try/except is to prevent calling the api too much
+                    try:
+                        worksheet.insert_row(rowInsert, 2,"USER_ENTERED")    
+                    except:
+                        time.sleep(100)
+                        err = False
+    # waits 100 secs so to not call the API too many times
+    if err:
+        time.sleep(100)
+    else:
+        err = True
