@@ -10,6 +10,11 @@ from datetime import datetime, timedelta
 import time
 import json
 
+"""
+503 errors:
+217 currentHyperlinks = worksheet.col_values(headerDict["Hyperlink"]+1)
+"""
+
 #returns number of seconds in day today
 #for comparing time by integer rather than by string
 def getTodaySecond():
@@ -169,12 +174,10 @@ while(True):
         # header of table, will be header of sheet
         # changed to header1 temporarily
         header1 = table.find("tr", valign='middle', align='center')
-        
         # continues if page is empty
         if(header1 == None):
             print("Empty Page")
             continue
-        
         # td tags of header, tags that have text
         header = header1.find_all('td')
         # header of website table
@@ -222,7 +225,14 @@ while(True):
         # goes through each block of news on the page
         for news in newsURL:
             # html of news section
-            newsHtml = requests.get(news).content
+            try:
+                newsHtml = requests.get(news).content
+            except:
+                print(datetime.now())
+                print("Too many requests")
+                print()
+                time.sleep(100)
+                err = False
             # soup object of news
             newsSoup = bs(newsHtml, 'lxml')
             # unit gets the news data, symbol gets the ticker
@@ -282,10 +292,16 @@ while(True):
                     try:
                         worksheet.insert_row(rowInsert, 2,"USER_ENTERED")    
                     except:
+                        print(datetime.now())
+                        print("Too many writes")
+                        print()
                         time.sleep(100)
                         err = False
     # waits 100 secs so to not call the API too many times
     if err:
+        print(datetime.now())
+        print("Normal sleep")
+        print()
         time.sleep(100)
     else:
         err = True
